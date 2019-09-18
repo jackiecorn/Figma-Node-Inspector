@@ -1,6 +1,11 @@
 <template lang="pug">
 div
-	json-viewer(v-show='error === ""' :value='json' :expand-depth='2' copyable theme="json-theme")
+	div(style='padding-left:4px')
+		.input-icon
+			.input-icon__icon
+				.icon.icon--search.icon--black-3
+		input.input-icon__input(type="input" placeholder='Search property' v-model='filterText' @keydown='inputKeydown')
+	json-viewer(v-show='error === ""' :value='json' :expand-depth='2' :copyable="{copyText: 'Copy', copiedText: 'Copied'}" theme="json-theme")
 	.error.type.type--pos-medium-normal(v-show='error !== ""') {{error}}
 </template>
 
@@ -13,8 +18,14 @@ export default {
   data() {
     return {
       json: {},
+      filterText: "",
       error: ""
     };
+  },
+  watch: {
+    filterText(val) {
+      dispatch("updateFilterText", val);
+    }
   },
   mounted() {
     handleEvent("updateNode", json => {
@@ -26,6 +37,14 @@ export default {
     });
     window.onfocus = () => dispatch("windowFocus", true);
     window.onblur = () => dispatch("windowFocus", false);
+  },
+  methods: {
+    inputKeydown(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "a") {
+        e.preventDefault();
+        e.target.select();
+      }
+    }
   }
 };
 </script>
@@ -35,9 +54,19 @@ export default {
 body {
   margin: 0;
 }
+
+span {
+  cursor: default;
+}
+
 .jv-container .jv-code {
   overflow: auto;
   padding: 16px;
+  padding-top: 8px;
+}
+
+.jv-container .jv-tooltip {
+  top: 4px;
 }
 
 .json-theme {
@@ -116,5 +145,21 @@ body {
   text-align: center;
   height: 600px;
   padding: 0 32px;
+}
+
+.input-icon__input:not(:disabled):not(:hover):placeholder-shown {
+  background: none;
+}
+
+.input-icon__input:not(:disabled):focus:placeholder-shown,
+.input-icon__input:hover,
+.input-icon__input:active,
+.input-icon__input:focus {
+  border: 2px solid transparent;
+}
+
+.input-icon__input:hover {
+  color: rgba(0, 0, 0, 0.8);
+  border: 1px solid transparent;
 }
 </style>
