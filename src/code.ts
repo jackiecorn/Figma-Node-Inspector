@@ -6,8 +6,10 @@ let oldSelection = [];
 
 const poll = () => {
 	const selection = figma.currentPage.selection;
-	if (selection.length === 0) dispatch('error', 'Please select a layer');
-	else inspect(selection);
+	if (selection.length === 0) {
+		oldSelection = [];
+		dispatch('error', 'Please select a layer');
+	} else inspect(selection);
 
 	if (!windowFocus) setTimeout(poll, 100);
 };

@@ -1,6 +1,7 @@
 <template lang="pug">
 div
-	json-viewer(:value='json' :expand-depth='2' copyable theme="json-theme")
+	json-viewer(v-show='error === ""' :value='json' :expand-depth='2' copyable theme="json-theme")
+	.error.type.type--pos-medium-normal(v-show='error !== ""') {{error}}
 </template>
 
 <script>
@@ -11,12 +12,17 @@ export default {
   components: { JsonViewer },
   data() {
     return {
-      json: {}
+      json: {},
+      error: ""
     };
   },
   mounted() {
     handleEvent("updateNode", json => {
+      this.error = "";
       this.json = json;
+    });
+    handleEvent("error", message => {
+      this.error = message;
     });
     window.onfocus = () => dispatch("windowFocus", true);
     window.onblur = () => dispatch("windowFocus", false);
@@ -74,7 +80,7 @@ body {
       color: #18a0fb;
     }
     &.jv-number {
-      color: #fc1e70;
+      color: #18a0fb;
     }
     &.jv-object {
       color: #111111;
@@ -101,5 +107,14 @@ body {
       }
     }
   }
+}
+
+.error {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  text-align: center;
+  height: 600px;
+  padding: 0 32px;
 }
 </style>
