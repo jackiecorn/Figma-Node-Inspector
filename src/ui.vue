@@ -7,7 +7,7 @@
 	.content.node(v-show="mode === 'node'")
 		.selector(v-show='showNodeSelector')
 			.label Node ID
-			input.input#nodeId(type="input" placeholder='Enter one or more node ID\'s, separated by comma' v-model='nodeId' @keydown='inputKeydown')
+			input.input#nodeId(ref='nodeInput' type="input" placeholder='Enter one or more node ID\'s, separated by comma' v-model='nodeId' @keydown='inputKeydown')
 			button.button.button--primary(:disabled='nodeId === ""' @click='selectNodes') Select Nodes
 		.header
 			.search
@@ -21,7 +21,7 @@
 	.content.component(v-show="mode === 'component'")
 		.selector(v-show='showComponentSelector')
 			.label Component key
-			input.input#componentKey(type="input" placeholder='Enter one or more keys, separated by comma' v-model='componentKey' @keydown='inputKeydown')
+			input.input#componentKey(ref='componentInput' type="input" placeholder='Enter one or more keys, separated by comma' v-model='componentKey' @keydown='inputKeydown')
 			button.button.button--primary(:disabled='componentKey === ""' @click='inspectComponents') Inspect Components
 		.header(v-show='JSON.stringify(componentJson) !== JSON.stringify({})')
 			.search
@@ -33,17 +33,17 @@
 		json-viewer(v-show='JSON.stringify(componentJson) !== JSON.stringify({})' :value='componentJson' :expand-depth='2' :copyable="{copyText: 'Copy', copiedText: 'Copied'}" theme="json-theme")
 	.content.style(v-show="mode === 'style'")
 		.selector(v-show='showStyleSelector')
-			select.select-menu#styleSelectorType(v-model='styleSelectorType' @change='updateStyleSelectorType')
+			select.select-menu#styleSelectorType(v-model='styleSelectorType')
 				option(value="id") Select by Style ID
 				option(value="key") Select by Style Key (Shared Styles)
 				option(value="local") All Local Styles
 			.selector-id(v-show="styleSelectorType === 'id'")
 				.label Style ID
-				input.input#styleId(type="input" placeholder='Enter one or more ID\'s, separated by semicolon ;' v-model='styleId' @keydown='inputKeydown')
+				input.input#styleId(ref='styleIdInput' type="input" placeholder='Enter one or more ID\'s, separated by semicolon ;' v-model='styleId' @keydown='inputKeydown')
 				button.button.button--primary(:disabled='styleId === ""' @click='inspectStylesById') Inspect Styles
 			.selector-key(v-show="styleSelectorType === 'key'")
 				.label Style Key
-				input.input#styleKey(type="input" placeholder='Enter one or more keys, separated by semicolon ;' v-model='styleKey' @keydown='inputKeydown')
+				input.input#styleKey(ref='styleKeyInput' type="input" placeholder='Enter one or more keys, separated by semicolon ;' v-model='styleKey' @keydown='inputKeydown')
 				button.button.button--primary(:disabled='styleKey === ""' @click='inspectStylesByKey') Inspect Styles
 		.header(v-show='JSON.stringify(styleJson) !== JSON.stringify({})')
 			.search
@@ -107,6 +107,24 @@ export default {
         this.styleSelectorType !== "local"
       )
         this.showStyleSelector = false;
+    },
+    showNodeSelector(val) {
+      if (val) setTimeout(() => this.$refs.nodeInput.focus(), 50);
+    },
+    mode(val) {
+      switch (val) {
+        case "node":
+          setTimeout(() => this.$refs.nodeInput.focus(), 50);
+          break;
+        case "component":
+          setTimeout(() => this.$refs.componentInput.focus(), 50);
+          break;
+        case "style":
+          if (this.styleSelectorType === "id")
+            setTimeout(() => this.$refs.styleIdInput.focus(), 50);
+          if (this.styleSelectorType === "key")
+            setTimeout(() => this.$refs.styleKeyInput.focus(), 50);
+      }
     }
   },
   mounted() {
@@ -128,10 +146,6 @@ export default {
     window.onblur = () => dispatch("windowFocus", false);
   },
   methods: {
-    updateStyleSelectorType(e) {
-      // console.log(e.target.value);
-      // console.log(this.styleSelectorType);
-    },
     inputKeydown(e) {
       if ((e.metaKey || e.ctrlKey) && e.key === "a") {
         e.preventDefault();
@@ -143,6 +157,11 @@ export default {
         if (e.target.id === "componentKey") this.inspectComponents();
         if (e.target.id === "styleId") this.inspectStylesById();
         if (e.target.id === "styleKey") this.inspectStylesByKey();
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.target.value = "";
+        e.target.dispatchEvent(new Event("input"));
       }
     },
     selectNodes() {
@@ -237,6 +256,7 @@ span {
 
 .jv-container .jv-button {
   z-index: 1;
+  padding-right: 0;
 }
 
 .jv-container .jv-tooltip {
