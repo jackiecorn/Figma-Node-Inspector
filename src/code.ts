@@ -23,8 +23,8 @@ const poll = () => {
 const nodeToObject = (node, filterText) => {
 	const props = Object.entries(Object.getOwnPropertyDescriptors(node.__proto__));
 	const blacklist = ['parent', 'children', 'removed'];
-	let obj: any = { id: node.id, children: undefined };
-	if (node.parent) obj.parent = { id: node.parent.id };
+	let obj: any = { id: node.id, type: node.type, children: undefined };
+	if (node.parent) obj.parent = { id: node.parent.id, type: node.type };
 	for (const [name, prop] of props) {
 		if (prop.get && blacklist.indexOf(name) < 0) {
 			obj[name] = prop.get.call(node);
