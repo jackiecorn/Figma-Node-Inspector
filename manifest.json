@@ -1,7 +1,8 @@
 {
-	"name": "Node Inspector",
-	"api": "1.0.0",
-	"main": "dist/code.js",
-	"ui": "dist/ui.html",
-	"id": "758276196886757462"
+  "name": "Node Inspector",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "id": "758276196886757462",
+  "editorType": ["figma", "figjam"]
 }

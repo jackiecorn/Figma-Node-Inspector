@@ -11,6 +11,7 @@
 		"vue-json-viewer": "^2.2.4"
 	},
 	"devDependencies": {
+		"@figma/plugin-typings": "^1.40.0",
 		"@types/node": "^12.0.5",
 		"css-loader": "^2.1.1",
 		"html-webpack-inline-source-plugin": "0.0.10",
